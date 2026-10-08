@@ -7,7 +7,7 @@ function Admin() {
     const [serviceId, setServiceId] = useState(1);
 
     const loadTokens = () => {
-        fetch("http://localhost:8081/tokens")
+        fetch("https://digital-queue-management-system-apyg.onrender.com/tokens")
             .then(response => response.json())
             .then(data => setTokens(data))
             .catch(error => console.log(error));
@@ -19,7 +19,7 @@ function Admin() {
 
     const callNext = () => {
         fetch(
-            `http://localhost:8081/tokens/next?serviceId=${serviceId}`,
+            `https://digital-queue-management-system-apyg.onrender.com/tokens/next?serviceId=${serviceId}`,
             {
                 method: "PUT"
             }
@@ -43,7 +43,7 @@ function Admin() {
 
     const completeToken = (id) => {
         fetch(
-            `http://localhost:8081/tokens/${id}/complete`,
+            `https://digital-queue-management-system-apyg.onrender.com/tokens/${id}/complete`,
             {
                 method: "PUT"
             }

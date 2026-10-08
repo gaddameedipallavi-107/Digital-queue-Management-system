@@ -53,7 +53,7 @@ function App() {
 
         if (page === "dashboard" && !token) {
 
-            fetch("http://localhost:8081/services")
+            fetch("https://digital-queue-management-system-apyg.onrender.com/services")
 
                 .then(response => {
 
@@ -85,7 +85,7 @@ function App() {
 
     const loadToken = (tokenId) => {
 
-        fetch(`http://localhost:8081/tokens/${tokenId}`)
+        fetch(`https://digital-queue-management-system-apyg.onrender.com/tokens/${tokenId}`)
 
             .then(response => {
 
@@ -128,7 +128,7 @@ function App() {
 
         setError("");
 
-        fetch("http://localhost:8081/users/login", {
+        fetch("https://digital-queue-management-system-apyg.onrender.com/users/login", {
 
             method: "POST",
 
@@ -189,7 +189,7 @@ function App() {
 
         setError("");
 
-        fetch("http://localhost:8081/users", {
+        fetch("https://digital-queue-management-system-apyg.onrender.com/users", {
 
             method: "POST",
 
@@ -254,7 +254,7 @@ function App() {
         }
 
         fetch(
-            `http://localhost:8081/tokens?userId=${user.id}&serviceId=${serviceId}`,
+            `https://digital-queue-management-system-apyg.onrender.com/tokens?userId=${user.id}&serviceId=${serviceId}`,
             {
                 method: "POST"
             }
@@ -313,7 +313,7 @@ function App() {
     const getQueuePosition = (tokenId) => {
 
         fetch(
-            `http://localhost:8081/tokens/${tokenId}/queue`
+            `https://digital-queue-management-system-apyg.onrender.com/tokens/${tokenId}/queue`
         )
 
             .then(response => response.text())
@@ -335,7 +335,7 @@ function App() {
     const getServingToken = (serviceId) => {
 
         fetch(
-            `http://localhost:8081/tokens/serving?serviceId=${serviceId}`
+            `https://digital-queue-management-system-apyg.onrender.com/tokens/serving?serviceId=${serviceId}`
         )
 
             .then(response => {
@@ -375,7 +375,7 @@ function App() {
         const interval = setInterval(() => {
 
             fetch(
-                `http://localhost:8081/tokens/${token.id}`
+                `https://digital-queue-management-system-apyg.onrender.com/tokens/${token.id}`
             )
 
                 .then(response => {
@@ -412,7 +412,7 @@ function App() {
 
 
                         fetch(
-                            `http://localhost:8081/tokens/serving?serviceId=${data.service.id}`
+                            `https://digital-queue-management-system-apyg.onrender.com/tokens/serving?serviceId=${data.service.id}`
                         )
 
                             .then(response => {
@@ -542,7 +542,7 @@ function App() {
 
 
         fetch(
-            `http://localhost:8081/tokens/${token.id}/transfer?serviceId=${transferServiceId}`,
+            `https://digital-queue-management-system-apyg.onrender.com/tokens/${token.id}/transfer?serviceId=${transferServiceId}`,
             {
                 method: "PUT"
             }
