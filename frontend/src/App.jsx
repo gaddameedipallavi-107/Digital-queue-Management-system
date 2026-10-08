@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function App() {
 
+    const navigate = useNavigate();
+
     const [page, setPage] = useState("login");
     const [user, setUser] = useState(null);
+
+    const [loginType, setLoginType] = useState("user");
 
     const [token, setToken] = useState(null);
     const [services, setServices] = useState([]);
@@ -34,15 +39,19 @@ function App() {
 
         if (savedUser) {
 
-            setUser(JSON.parse(savedUser));
-            setPage("dashboard");
+            const savedUserData = JSON.parse(savedUser);
 
+            setUser(savedUserData);
+
+            if (savedUserData.role === "ADMIN") {
+                navigate("/admin");
+            } else {
+                setPage("dashboard");
+            }
         }
 
         if (savedTokenId) {
-
             loadToken(savedTokenId);
-
         }
 
     }, []);
@@ -53,7 +62,9 @@ function App() {
 
         if (page === "dashboard" && !token) {
 
-            fetch("https://digital-queue-management-system-apyg.onrender.com/services")
+            fetch(
+                "https://digital-queue-management-system-apyg.onrender.com/services"
+            )
 
                 .then(response => {
 
@@ -85,7 +96,9 @@ function App() {
 
     const loadToken = (tokenId) => {
 
-        fetch(`https://digital-queue-management-system-apyg.onrender.com/tokens/${tokenId}`)
+        fetch(
+            `https://digital-queue-management-system-apyg.onrender.com/tokens/${tokenId}`
+        )
 
             .then(response => {
 
@@ -128,20 +141,23 @@ function App() {
 
         setError("");
 
-        fetch("https://digital-queue-management-system-apyg.onrender.com/users/login", {
+        fetch(
+            "https://digital-queue-management-system-apyg.onrender.com/users/login",
+            {
 
-            method: "POST",
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body: JSON.stringify({
-                email: loginEmail,
-                password: loginPassword
-            })
+                body: JSON.stringify({
+                    email: loginEmail,
+                    password: loginPassword
+                })
 
-        })
+            }
+        )
 
             .then(response => {
 
@@ -159,6 +175,28 @@ function App() {
 
             .then(data => {
 
+                if (
+                    loginType === "admin" &&
+                    data.role !== "ADMIN"
+                ) {
+
+                    throw new Error(
+                        "This account is not an Admin account"
+                    );
+
+                }
+
+                if (
+                    loginType === "user" &&
+                    data.role === "ADMIN"
+                ) {
+
+                    throw new Error(
+                        "Please select Admin Login"
+                    );
+
+                }
+
                 localStorage.setItem(
                     "user",
                     JSON.stringify(data)
@@ -166,10 +204,18 @@ function App() {
 
                 setUser(data);
 
-                setPage("dashboard");
-
                 setLoginEmail("");
                 setLoginPassword("");
+
+                if (data.role === "ADMIN") {
+
+                    navigate("/admin");
+
+                } else {
+
+                    setPage("dashboard");
+
+                }
 
             })
 
@@ -189,21 +235,25 @@ function App() {
 
         setError("");
 
-        fetch("https://digital-queue-management-system-apyg.onrender.com/users", {
+        fetch(
+            "https://digital-queue-management-system-apyg.onrender.com/users",
+            {
 
-            method: "POST",
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body: JSON.stringify({
-                name: registerName,
-                email: registerEmail,
-                password: registerPassword
-            })
+                body: JSON.stringify({
+                    name: registerName,
+                    email: registerEmail,
+                    password: registerPassword,
+                    role: "USER"
+                })
 
-        })
+            }
+        )
 
             .then(response => {
 
@@ -341,9 +391,7 @@ function App() {
             .then(response => {
 
                 if (!response.ok) {
-
                     return null;
-
                 }
 
                 return response.json();
@@ -367,9 +415,7 @@ function App() {
     useEffect(() => {
 
         if (!token || !token.id) {
-
             return;
-
         }
 
         const interval = setInterval(() => {
@@ -401,15 +447,11 @@ function App() {
                         data.id
                     );
 
-
-
                     if (data.status === "WAITING") {
 
                         getQueuePosition(
                             data.id
                         );
-
-
 
                         fetch(
                             `https://digital-queue-management-system-apyg.onrender.com/tokens/serving?serviceId=${data.service.id}`
@@ -418,9 +460,7 @@ function App() {
                             .then(response => {
 
                                 if (!response.ok) {
-
                                     return null;
-
                                 }
 
                                 return response.json();
@@ -431,15 +471,11 @@ function App() {
 
                                 setServingToken(serving);
 
-
-
                                 if (serving) {
 
                                     const difference =
                                         data.tokenNumber -
                                         serving.tokenNumber;
-
-
 
                                     if (
                                         difference === 2 &&
@@ -461,8 +497,6 @@ function App() {
 
                                     }
 
-
-
                                     else if (
                                         difference <= 0 &&
                                         turnAlert !== "now"
@@ -479,8 +513,6 @@ function App() {
                                         setTurnAlert("now");
 
                                     }
-
-
 
                                     else if (
                                         difference > 2
@@ -500,8 +532,6 @@ function App() {
 
                     }
 
-
-
                     if (data.status === "SERVING") {
 
                         getServingToken(
@@ -517,8 +547,6 @@ function App() {
                 );
 
         }, 2000);
-
-
 
         return () =>
             clearInterval(interval);
@@ -538,8 +566,6 @@ function App() {
             return;
 
         }
-
-
 
         fetch(
             `https://digital-queue-management-system-apyg.onrender.com/tokens/${token.id}/transfer?serviceId=${transferServiceId}`,
@@ -616,7 +642,11 @@ function App() {
         setShowTransfer(false);
         setTransferServiceId("");
 
+        setLoginType("user");
+
         setPage("login");
+
+        navigate("/");
 
     };
 
@@ -663,6 +693,50 @@ function App() {
                     <p className="form-description">
                         Login to manage your digital queue.
                     </p>
+
+
+
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "10px",
+                            marginBottom: "20px"
+                        }}
+                    >
+
+                        <button
+                            type="button"
+                            className={
+                                loginType === "user"
+                                    ? "primary-button"
+                                    : "secondary-button"
+                            }
+                            onClick={() => {
+                                setLoginType("user");
+                                setError("");
+                            }}
+                        >
+                            👤 User
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                loginType === "admin"
+                                    ? "primary-button"
+                                    : "secondary-button"
+                            }
+                            onClick={() => {
+                                setLoginType("admin");
+                                setError("");
+                            }}
+                        >
+                            👨‍💼 Admin
+                        </button>
+
+                    </div>
+
+
 
                     <form onSubmit={login}>
 
@@ -712,30 +786,41 @@ function App() {
                             className="primary-button"
                             type="submit"
                         >
-                            Login
+                            {loginType === "admin"
+                                ? "Admin Login"
+                                : "Login"
+                            }
                         </button>
 
                     </form>
 
-                    <div className="divider">
-                        OR
-                    </div>
+                    {loginType === "user" && (
 
-                    <p className="account-text">
-                        Don't have an account?
-                    </p>
+                        <>
 
-                    <button
-                        className="secondary-button"
-                        onClick={() => {
+                            <div className="divider">
+                                OR
+                            </div>
 
-                            setError("");
-                            setPage("register");
+                            <p className="account-text">
+                                Don't have an account?
+                            </p>
 
-                        }}
-                    >
-                        Create Account
-                    </button>
+                            <button
+                                className="secondary-button"
+                                onClick={() => {
+
+                                    setError("");
+                                    setPage("register");
+
+                                }}
+                            >
+                                Create Account
+                            </button>
+
+                        </>
+
+                    )}
 
                 </div>
 
@@ -809,7 +894,7 @@ function App() {
 
                         <label className="form-label">
                             Password
-                        </label>
+                            </label>
 
                         <input
                             className="input"
