@@ -23,7 +23,8 @@ import queue_management.repository.UserRepository;
 @CrossOrigin(origins = {
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:5175"
+        "http://localhost:5175",
+        "https://digital-queue-frontend-1enz.onrender.com"
 })
 public class TokenController {
 
